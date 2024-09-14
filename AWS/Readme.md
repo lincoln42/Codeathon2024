@@ -77,6 +77,10 @@ Use the AWS Cloud formation script below to setup a VPC with the following eleme
 
 The AWS Cloud formation script to do this is as below. You can login into the AWS account and run the below cloud formation script to in AWS Cloudformation to create the VPC.
 
+<details>
+
+<summary>AWS VPC to host UI and API</summary>
+
 ``` yaml
 AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation template to create a VPC with public and private subnets, EKS cluster, RDS instances
@@ -430,6 +434,8 @@ Resources:
             app: !Ref APIAppSelectorLabelValue
 ```
 
+</details>
+
 ## Setup the AWS EKS Load Balancer controller
 
 Once the above VPCs have been setup on your account. The AWS Load balancer controller will need to be installed.
@@ -647,3 +653,59 @@ Use the command below to deploy the above deployment to EKS
 #### Deploy the API
 
 Follow a similar set of steps to deploy the API to EKS as done for the UI, note that the API will need to be configured to use the AWS RDS instance in the VPC.
+
+## Hosting the UI on S3
+
+If you don't want to host the UI on EKS as described above you can also host the UI on S3 and create point the AWs Route 53 DNS to the URL of the public S3 bucket. Adapt the instructions below to suit your environment.
+
+- Build Your Next.js Application
+First, ensure your Next.js application is ready for production by building it.
+
+- Export the Static Site
+Modify your package.json to include the export script:
+
+```json
+"scripts": {
+  "build": "next build && next export"
+}
+```
+
+Run the build command to generate static files:
+
+```
+npm run build
+```
+
+This will create an **out** directory containing your static site.
+
+- Set Up an S3 Bucket
+  1. Log in to the AWS Management Console.
+  2. Navigate to S3 and click on Create bucket.
+  3. Name your bucket the same name as your application.
+  4. Enable public access by unchecking “Block all public access” and acknowledging the warning.
+  5. Enable static website hosting in the bucket properties. Set the index document to index.html.
+
+- Upload Your Static Files using the AWS Console
+  - Go to your S3 bucket.
+  - Click on Upload and add the contents of the out directory.
+  - Once uploaded, your site should be accessible via the S3 bucket URL.
+  - Configure Bucket Policy
+  To make your site publicly accessible, add a bucket policy
+
+```json
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::<Name of S3 Bucket with UI>/*"
+    }
+  ]
+}
+
+```
+
+Access the UI using the S3 bucket URL provided in the static website hosting settings.
