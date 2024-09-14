@@ -79,7 +79,7 @@ The AWS Cloud formation script to do this is as below. You can login into the AW
 
 <details>
 
-<summary>AWS VPC to host UI and API</summary>
+<summary>AWS VPC to host UI and API (Click to Expand)</summary>
 
 ``` yaml
 AWSTemplateFormatVersion: '2010-09-09'
